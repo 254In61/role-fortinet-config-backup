@@ -1,0 +1,18 @@
+---
+# Backup fortios
+# If this doesn't work, check the main branch option
+- name: Backup FortiOS Configuration
+  fortinet.fortios.fortios_config:
+    vdom: "{{ fortios_vdom }}" # virtual domain
+    selector: "system"
+    access_token: "{{ fortios_access_token }}"
+  register: fortios_config_output
+
+# Or this approach?
+# - name: FortiGate configuration Backup
+#   ansible.builtin.raw: |
+#     execute cfg save
+#     execute backup config tftp {{ backup_filename }} {{ tftp_server }}
+
+# Or this approach?
+# https://absent.org/2023/10/24/backup-fortigate-with-ansible.html
