@@ -17,6 +17,12 @@ Role contains tasks that perform config backup of fortios devices
 Ref: appc-config-backup
 
 
+# How to use
+- Install the role : $ ansible-galaxy install -r collections/requirements.yml
+  ** The collections/requirements.yml file will be in your tool's repo**
+  
+
+
 # License
 BSD
 
