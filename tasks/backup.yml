@@ -1,12 +1,12 @@
 ---
 # Backup fortios
 # If this doesn't work, check the main branch option
-- name: Backup FortiOS Configuration
-  fortinet.fortios.fortios_config:
-    vdom: "{{ fortios_vdom }}" # virtual domain
-    selector: "system"
-    access_token: "{{ fortios_access_token }}"
-  register: fortios_config_output
+# - name: Backup FortiOS Configuration
+#   fortinet.fortios.fortios_config:
+#     vdom: "{{ fortios_vdom }}" # virtual domain
+#     selector: "system"
+#     access_token: "{{ fortios_access_token }}"
+#   register: fortios_config_output
 
 # Or this approach?
 # - name: FortiGate configuration Backup
@@ -16,3 +16,29 @@
 
 # Or this approach?
 # https://absent.org/2023/10/24/backup-fortigate-with-ansible.html
+
+- name: Gather FortiGate configuration facts
+  fortinet.fortios.fortios_configuration_fact:
+    username: "{{ ansible_user }}"      # Username from inventory
+    password: "{{ ansible_password }}"  # Password from inventory
+    vdom: "{{ fortios_vdom }}"
+  register: config_output
+
+# - name: Save the configuration to a file
+#   copy:
+#     content: "{{ config_output | to_nice_json }}"
+#     dest: "/path/to/backup/{{ inventory_hostname }}_backup.json"
+
+# regex_replace('\r\n', '\n'): Ensures that the configuration is formatted properly with new lines,
+# in case the original output contains carriage return and line feed (\r\n).
+- name: Ensure the config is properly formatted
+  ansible.builtin.set_fact:
+    # formatted_config: "{{ config_output.stdout[0] | regex_replace('\r\n', '\n') }}"
+    formatted_config: "{{ config_output | to_nice_json }}"
+  delegate_to: localhost
+
+- name: Save the configuration to the temporary config store
+  ansible.builtin.copy:
+    content: "{{ formatted_config }}"
+    dest: "{{ tmp_config_store }}"
+  delegate_to: localhost
