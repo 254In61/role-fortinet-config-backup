@@ -1,7 +1,7 @@
 ---
 # Backup fortios
 - name: Execute backup script
-  ansible.builtin.script: "scripts/fortios_show.sh {{ ansible_user }} {{ ansible_password }}  {{ ansible_host }} {{ backup_file }}"
+  ansible.builtin.script: "scripts/fortios_show.sh {{ ansible_user }} {{ ansible_password }}  {{ ansible_host }} {{ tmp_config_store }}"
   register: config_backup
   failed_when: config_backup["failed"] != false
   delegate_to: localhost
