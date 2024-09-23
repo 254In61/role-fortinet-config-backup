@@ -18,6 +18,9 @@
   failed_when: config_output["failed"] != false
   delegate_to: localhost
 
+- name: Debug output
+  ansible.builtin.debug:
+    var: "{{ config_output.stdout }}"
 
 - name: Save the configuration to the temporary config store
   ansible.builtin.copy:
