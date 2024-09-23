@@ -26,7 +26,8 @@
 
 - name: Debug output
   ansible.builtin.debug:
-    var: "{{ config_output.stdout }}"
+    var: "{{ config_output }}"
+
 
 # - name: Save the configuration to the temporary config store
 #   ansible.builtin.copy:
