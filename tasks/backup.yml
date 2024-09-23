@@ -1,22 +1,7 @@
 ---
-# Backup fortios
-# - name: Copy the bash script to the target host
-#   ansible.builtin.copy:
-#     src: fortios_show.sh
-#     dest: /tmp/fortios_show.sh
-#     mode: '0755'
-
-# - name: Execute backup script
-#   ansible.builtin.script: "/tmp/fortios_show.sh {{ ansible_user }} {{ ansible_password }}  {{ ansible_host }} {{ tmp_config_store }}"
-#   register: config_output
-#   failed_when: config_output["failed"] != false
-#   delegate_to: localhost
-
-# - name: Debug output
-#   ansible.builtin.debug:
-#     var: config_output
-
-
+# Fortios config backup.
+# Using direct shell ssh to device and extracting configurations.
+# Different httpapi approach to be looked into once network and licencing is in order.
 - name: Retrieve configuration from FortiGate
   ansible.builtin.shell: >
     sshpass -p "{{ ansible_password }}" ssh -o StrictHostKeyChecking=no {{ ansible_user }}@{{ ansible_host }} {{ cmd }} > {{ tmp_config_store }}
@@ -27,10 +12,3 @@
 - name: Debug output
   ansible.builtin.debug:
     var: "{{ config_output }}"
-
-
-# - name: Save the configuration to the temporary config store
-#   ansible.builtin.copy:
-#     content: "{{ config_output.stdout }}"
-#     dest: "{{ tmp_config_store }}"
-#   delegate_to: localhost
