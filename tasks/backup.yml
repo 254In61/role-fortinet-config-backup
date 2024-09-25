@@ -9,6 +9,6 @@
   failed_when: config_output["failed"] != false
   delegate_to: localhost
 
-- name: Debug output
-  ansible.builtin.debug:
-    var: config_output
+# - name: Debug output
+#   ansible.builtin.debug:
+#     var: config_output
