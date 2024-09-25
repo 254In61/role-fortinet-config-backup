@@ -8,6 +8,7 @@
   register: config_output
   failed_when: config_output["failed"] != false
   delegate_to: localhost
+  ignore_errors: yes
 
 # - name: Debug output
 #   ansible.builtin.debug:
