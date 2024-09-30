@@ -1,14 +1,14 @@
 ---
 # Fortios config backup.
 # Using direct shell ssh to device and extracting configurations.
-# Different httpapi approach to be looked into once network and licencing is in order.
+# Couldn't find a more efficient module in fortios collection
 - name: Retrieve configuration from FortiGate
   ansible.builtin.shell: >
     sshpass -p "{{ ansible_password }}" ssh -o StrictHostKeyChecking=no {{ ansible_user }}@{{ ansible_host }} {{ cmd }} | sed 's/^.*#//g;s/#.*$//g' > {{ tmp_config_store }}
   register: config_output
-  failed_when: config_output["failed"] != false
+  failed_when: config_output["stderr"] != ""
   delegate_to: localhost
-  ignore_errors: yes
+  ignore_errors: true
 
 # - name: Debug output
 #   ansible.builtin.debug:
