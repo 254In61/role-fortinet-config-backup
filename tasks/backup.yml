@@ -1,6 +1,9 @@
 ---
 # Fortios config backup.
 # Using direct shell ssh to device and extracting configurations.
+
+# Not the most secure way to do stuff!
+# sshpass prints out the credentials
 # Couldn't find a more efficient module in fortios collection
 - name: Retrieve configuration from FortiGate
   ansible.builtin.shell: >
