@@ -10,6 +10,7 @@
   delegate_to: localhost
   ignore_errors: true
 
-# - name: Debug output
-#   ansible.builtin.debug:
-#     var: config_output
+- name: Debug results
+  ansible.builtin.debug:
+    var: config_output
+  delegate_to: localhost
