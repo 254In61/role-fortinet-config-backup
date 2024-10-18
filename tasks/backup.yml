@@ -7,7 +7,7 @@
 # Couldn't find a more efficient module in fortios collection
 - name: Retrieve configuration from FortiGate
   ansible.builtin.shell: >
-    sshpass -p "{{ ansible_password }}" ssh -o StrictHostKeyChecking=no {{ ansible_user }}@{{ ansible_host }} {{ cmd }} | sed 's/^.*#//g;s/#.*$//g' > {{ tmp_config_store }}
+    sshpass -p "{{ ansible_password }}" ssh -o StrictHostKeyChecking=no {{ ansible_user }}@{{ ansible_host }} {{ cmd }} | sed 's/^.*#//g;s/#.*$//g' > {{ tmp_file_path }}
   register: config_output
   failed_when: "'refused' in config_output['stderr']"
   delegate_to: localhost
