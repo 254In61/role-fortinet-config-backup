@@ -6,20 +6,6 @@
     ansible_connection: ssh
   delegate_to: localhost
 
-# Fortios config backup.
-# Using direct shell ssh to device and extracting configurations.
-
-# Not the most secure way to do stuff!
-# sshpass prints out the credentials
-# Couldn't find a more efficient module in fortios collection
-# - name: Retrieve configuration from FortiGate
-#   ansible.builtin.shell: >
-#     sshpass -p "{{ ansible_password }}" ssh -o StrictHostKeyChecking=no {{ ansible_user }}@{{ ansible_host }} {{ cmd }} | sed 's/^.*#//g;s/#.*$//g' > {{ tmp_file_path }}
-#   register: config_output
-#   failed_when: "'refused' in config_output['stderr']"
-#   delegate_to: localhost
-#   ignore_errors: true
-
 - name: Retrieve configs
   ansible.builtin.raw: |
     show
