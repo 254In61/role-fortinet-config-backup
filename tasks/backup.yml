@@ -26,46 +26,46 @@
   register: config_output
   # failed_when: "'refused' in config_output['stderr']"
 
-- name: Debug results
-  ansible.builtin.debug:
-    var: config_output
-  delegate_to: localhost
+# - name: Debug results
+#   ansible.builtin.debug:
+#     var: config_output
+#   delegate_to: localhost
 
 # regex_replace('\r\n', '\n'): Ensures that the configuration is formatted properly with new lines,
 # in case the original output contains carriage return and line feed (\r\n).
-# - name: Ensure the config is properly formatted
-#   ansible.builtin.set_fact:
-#     formatted_config: "{{ config_output.stdout[0] | regex_replace('\r\n', '\n') }}"
-#   delegate_to: localhost
-#   ignore_errors: true
-#   when: config_output["failed"] == false
+- name: Ensure the config is properly formatted
+  ansible.builtin.set_fact:
+    formatted_config: "{{ config_output.stdout[0] | regex_replace('\r\n', '\n') }}"
+  delegate_to: localhost
+  ignore_errors: true
+  when: config_output["failed"] == false
 
-# - name: Save the configuration to the temporary config store
-#   ansible.builtin.copy:
-#     content: "{{ formatted_config }}"
-#     dest: "{{ tmp_file_path }}"
-#   delegate_to: localhost
-#   ignore_errors: true
-#   when: config_output["failed"] == false
+- name: Save the configuration to the temporary config store
+  ansible.builtin.copy:
+    content: "{{ formatted_config }}"
+    dest: "{{ tmp_file_path }}"
+  delegate_to: localhost
+  ignore_errors: true
+  when: config_output["failed"] == false
 
 # Git tasks
 
-# - name: Clone the config backup git repository
-#   ansible.builtin.git:
-#     repo: "{{ git_repo_url }}"
-#     dest: "{{ tmp_root_dir }}/{{ git_repo_name }}"
-#     version: "{{ git_repo_branch }}"
-#     force: yes       # Still clone down and overwrite incase local repo is existing.
-#   ignore_errors: true
-#   run_once: true
-#   delegate_to: localhost
+- name: Clone the config backup git repository
+  ansible.builtin.git:
+    repo: "{{ git_repo_url }}"
+    dest: "{{ tmp_root_dir }}/{{ git_repo_name }}"
+    version: "{{ git_repo_branch }}"
+    force: yes       # Still clone down and overwrite incase local repo is existing.
+  ignore_errors: true
+  run_once: true
+  delegate_to: localhost
 
-# - name: Ensure inventory_hostname dir is present - create if absent
-#   ansible.builtin.file:
-#     path: "{{ inventory_hostname_dir_path }}"
-#     state: directory
-#   ignore_errors: true
-#   delegate_to: localhost
+- name: Ensure inventory_hostname dir is present - create if absent
+  ansible.builtin.file:
+    path: "{{ inventory_hostname_dir_path }}"
+    state: directory
+  ignore_errors: true
+  delegate_to: localhost
 
 # - name: List collected running config files
 #   ansible.builtin.shell: |
@@ -80,20 +80,32 @@
 #   run_once: true
 #   delegate_to: localhost
 
-# - name: Copy the .cfg file to local git repo
-#   ansible.builtin.shell: |
-#     cp {{ tmp_file_path }} {{ inventory_hostname_dir_path }}
-#   ignore_errors: true
-#   delegate_to: localhost
+- name: Copy the .cfg file to local git repo
+  ansible.builtin.shell: |
+    cp {{ tmp_file_path }} {{ inventory_hostname_dir_path }}
+  ignore_errors: true
+  delegate_to: localhost
 
-# - name: Commit the changes and push to the remote repository
-#   ansible.builtin.shell: |
-#      cd {{ tmp_root_dir }}/{{ git_repo_name }}
-#      git config --global user.name {{ git_user }}
-#      git config --global user.email {{ git_user_email }}
-#      git add .
-#      git commit -m "file updates on $(date)"
-#      git push
-#   run_once: true
-#   ignore_errors: true
-#   delegate_to: localhost
+- name: Commit the changes and push to the remote repository
+  ansible.builtin.shell: |
+     cd {{ tmp_root_dir }}/{{ git_repo_name }}
+     git config --global user.name {{ git_user }}
+     git config --global user.email {{ git_user_email }}
+     git add .
+     git commit -m "file updates on $(date)"
+     git push
+  run_once: true
+  environment:
+    GIT_SSL_NO_VERIFY: "true"
+  # ignore_errors: true # You want the play to fail if git push does not happen
+  delegate_to: localhost
+
+# Might not need this since containers are ephemeral.
+# But if testing or end up running the playbook more than once in the same container, this comes in handy
+- name: Clean up files
+  ansible.builtin.shell: |
+    cd {{ tmp_root_dir }}
+    rm -rf {{ git_repo_name }}
+  run_once: true
+  ignore_errors: true
+  delegate_to: localhost
