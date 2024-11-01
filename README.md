@@ -1,5 +1,5 @@
 # role-cisco-config-backup
-Ansible role to backup cisco devices configs.
+Ansible role to backup fortinet devices configs.
 
 # How to use
 Step 1: Install the role in your environment.
