@@ -81,7 +81,7 @@
     dest: "{{ tmp_file_path }}"
   delegate_to: localhost
   ignore_errors: true
-  when: config_output["failed"] == false
+  when: fortios_config["failed"] == false
 
 #### STEP 4 : DELETE CREATED REST API USER
 - name: Remove rest-api-admin user
