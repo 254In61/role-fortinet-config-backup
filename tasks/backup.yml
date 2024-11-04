@@ -64,7 +64,6 @@
     return_content: true
   register: fortios_config
   delegate_to: localhost
-  no_log: true
 
 - name: Debug fortios_config output
   ansible.builtin.debug:
