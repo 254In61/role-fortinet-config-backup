@@ -26,7 +26,7 @@
   no_log: false
 
 - name: Debug create_user output
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     var: create_user
 
 - name: Generate rest-api-admin user token
@@ -37,7 +37,7 @@
   no_log: false
 
 - name: Debug generate_token output
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     var: generate_token
 
 # - name: Change connection type
