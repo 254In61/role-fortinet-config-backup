@@ -130,7 +130,7 @@
   ansible.builtin.raw: |
     config global
     config system api-user
-    delete {{ fortios_user_management_user }}
+    delete {{ api_admin_user }}
     end
   register: remove_user
   no_log: false
