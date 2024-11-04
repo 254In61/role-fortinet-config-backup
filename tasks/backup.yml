@@ -11,6 +11,8 @@
     tmp_file_path: "{{ tmp_root_dir }}/{{ inventory_hostname }}-running-config.cfg"
     inventory_hostname_dir_path: "{{ tmp_root_dir }}/{{ git_repo_name }}/{{ vendor_dir }}/{{ inventory_hostname }}/config-backup"
     ansible_connection: ssh # Change connection type to ssh
+    api_admin_user: rest-api-admin
+    mgmt_vdom: root
   delegate_to: localhost
 
 - name: Create a rest-api-admin user
