@@ -110,6 +110,15 @@
 
 ####STEP 4. GIT OPERATIONS
 
+- name: Clean up files      # Avoid git conflicts
+  ansible.builtin.shell: |
+    cd {{ tmp_root_dir }}
+    rm -rf {{ git_repo_name }}
+  run_once: true
+  ignore_errors: true
+  delegate_to: localhost
+
+
 - name: Clone the config backup git repository
   ansible.builtin.git:
     repo: "{{ git_repo_url }}"
