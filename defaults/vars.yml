@@ -1,0 +1,4 @@
+---
+# Default vars for the role
+api_admin_user: rest_api_admin
+mgmt_vdom: root
