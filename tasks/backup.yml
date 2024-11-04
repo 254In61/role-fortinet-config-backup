@@ -40,6 +40,14 @@
   register: generate_token
   no_log: false
 
+- name: Enable https accessibility
+  ansible.builtin.raw: |
+    config system interface
+    edit "port1"
+    set allowaccess https
+  register: https_config
+    
+
 # - name: Debug generate_token output
 #   ansible.builtin.debug:
 #     var: generate_token
@@ -56,6 +64,7 @@
 #       - "{{ api_admin_user }}"
 
 #### STEP 3 : EXTRACT RUNNING CONFIGS USING REST API
+
 - name: extract running configs for {{ inventory_hostname }} using REST API Call
   ansible.builtin.uri:
     url: "https://{{ inventory_hostname }}/api/v2/monitor/system/config/backup"
@@ -85,7 +94,6 @@
   ignore_errors: true
   when: fortios_config["failed"] == false
 
-#### STEP 4 : DELETE CREATED REST API USER
 - name: Remove rest-api-admin user
   ansible.builtin.raw: |
     config global
@@ -96,7 +104,7 @@
   no_log: false
   ignore_errors: true # You don't want all of them failing if first 2-3 fails
 
-####STEP 4. GIT OPERATIONS
+####GIT OPERATIONS
 
 - name: Clean up files      # Avoid git conflicts
   ansible.builtin.shell: |
