@@ -48,7 +48,9 @@
   
 - name: Display the extracted API token
   ansible.builtin.debug:
-    msg: "{{ api_token }}"
+    msg: 
+      - "{{ api_token }}"
+      - "{{ api_admin_user }}"
 
 - name: Get FortiOS System Global Config for {{ inventory_hostname }}
   ansible.builtin.uri:
