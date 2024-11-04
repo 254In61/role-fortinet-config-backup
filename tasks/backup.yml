@@ -47,7 +47,8 @@
 - name: Extract API token from command output
   ansible.builtin.set_fact:
     api_token: "{{ generate_token.stdout | regex_search('New API key: (\\w+)', '\\1') }}" #generates a list
-  
+  delegate_to: localhost
+
 # - name: Display the extracted API token
 #   ansible.builtin.debug:
 #     msg: 
@@ -55,7 +56,7 @@
 #       - "{{ api_admin_user }}"
 
 #### STEP 3 : EXTRACT RUNNING CONFIGS USING REST API
-- name: Get FortiOS System Global Config for {{ inventory_hostname }}
+- name: extract running configs for {{ inventory_hostname }} using REST API Call
   ansible.builtin.uri:
     url: "https://{{ inventory_hostname }}/api/v2/monitor/system/config/backup"
     method: POST
@@ -69,6 +70,7 @@
     return_content: true
   register: fortios_config
   delegate_to: localhost
+  ignore_errors: true # You don't want all of them failing if first 2-3 fails
 
 # - name: Debug fortios_config output
 #   ansible.builtin.debug:
@@ -92,6 +94,7 @@
     end
   register: remove_user
   no_log: false
+  ignore_errors: true # You don't want all of them failing if first 2-3 fails
 
 ####STEP 4. GIT OPERATIONS
 
@@ -102,7 +105,7 @@
   run_once: true
   ignore_errors: true
   delegate_to: localhost
-
+  delegate_to: localhost
 
 - name: Clone the config backup git repository
   ansible.builtin.git:
