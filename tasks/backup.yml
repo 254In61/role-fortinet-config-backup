@@ -44,12 +44,12 @@
 
 - name: Extract API token from command output
   ansible.builtin.set_fact:
-    api_token_list: "{{ generate_token.stdout | regex_search('New API key: (\\w+)', '\\1') }}" #generates a list
+    api_token: "{{ generate_token.stdout | regex_search('New API key: (\\w+)', '\\1')[0] }}" #generates a list
   
 - name: Display the extracted API token
   ansible.builtin.debug:
     msg: 
-      - "{{ api_token_list }}[0]"
+      - "{{ api_token }}[0]"
       - "{{ api_admin_user }}"
 
 - name: Get FortiOS System Global Config for {{ inventory_hostname }}
@@ -58,7 +58,7 @@
     method: POST
     headers:
       Content-Type: "application/json"
-      Authorization: "Bearer {{ api_token_list }}[0]"
+      Authorization: "Bearer {{ api_token }}"
     body:
       scope: "global"
     body_format: "json"
