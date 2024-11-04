@@ -2,10 +2,11 @@
 # STEP 1. Create a rest-api-admin user on the fly. *** Assumption == account for ssh has the rights to do this ***
 # STEP 2. Generate api key for the rest-api-admin user
 # STEP 3. Use the api token to extract configs
-# STEP 4. Git operations
-# STEP 5. Delete the created rest-api-admin user
+# STEP 4. Delete the created rest-api-admin user
+# STEP 5. Git operations
 
-##### STEP 1. CREATE REST API ADMIN USER
+
+#### STEP 1. CREATE REST API ADMIN USER
 - name: Set varibales
   ansible.builtin.set_fact:
     tmp_file_path: "{{ tmp_root_dir }}/{{ inventory_hostname }}-running-config.cfg"
@@ -31,6 +32,7 @@
 #   ansible.builtin.debug:
 #     var: create_user
 
+#### STEP 2 : GENERATE API KEY/TOKEN FOR SUBSEQUENT TASKS
 - name: Generate rest-api-admin user token
   ansible.builtin.raw: |
     config global
@@ -46,12 +48,13 @@
   ansible.builtin.set_fact:
     api_token: "{{ generate_token.stdout | regex_search('New API key: (\\w+)', '\\1') }}" #generates a list
   
-- name: Display the extracted API token
-  ansible.builtin.debug:
-    msg: 
-      - "{{ api_token[0] }}"
-      - "{{ api_admin_user }}"
+# - name: Display the extracted API token
+#   ansible.builtin.debug:
+#     msg: 
+#       - "{{ api_token[0] }}"
+#       - "{{ api_admin_user }}"
 
+#### STEP 3 : EXTRACT RUNNING CONFIGS USING REST API
 - name: Get FortiOS System Global Config for {{ inventory_hostname }}
   ansible.builtin.uri:
     url: "https://{{ inventory_hostname }}/api/v2/monitor/system/config/backup"
@@ -67,10 +70,28 @@
   register: fortios_config
   delegate_to: localhost
 
-- name: Debug fortios_config output
-  ansible.builtin.debug:
-    var: fortios_config
+# - name: Debug fortios_config output
+#   ansible.builtin.debug:
+#     var: fortios_config
+#   delegate_to: localhost
 
+- name: Save the configuration to the temporary config store
+  ansible.builtin.copy:
+    content: "{{ fortios_config.content }}"
+    dest: "{{ tmp_file_path }}"
+  delegate_to: localhost
+  ignore_errors: true
+  when: config_output["failed"] == false
+
+#### STEP 4 : DELETE CREATED REST API USER
+- name: Remove rest-api-admin user
+  ansible.builtin.raw: |
+    config global
+    config system api-user
+    delete {{ api_admin_user }}
+    end
+  register: remove_user
+  no_log: false
 
 # - name: Change connection type
 #   ansible.builtin.set_fact:
@@ -89,22 +110,22 @@
 
 ####STEP 4. GIT OPERATIONS
 
-# - name: Clone the config backup git repository
-#   ansible.builtin.git:
-#     repo: "{{ git_repo_url }}"
-#     dest: "{{ tmp_root_dir }}/{{ git_repo_name }}"
-#     version: "{{ git_repo_branch }}"
-#     force: yes       # Still clone down and overwrite incase local repo is existing.
-#   ignore_errors: true
-#   run_once: true
-#   delegate_to: localhost
+- name: Clone the config backup git repository
+  ansible.builtin.git:
+    repo: "{{ git_repo_url }}"
+    dest: "{{ tmp_root_dir }}/{{ git_repo_name }}"
+    version: "{{ git_repo_branch }}"
+    force: yes       # Still clone down and overwrite incase local repo is existing.
+  ignore_errors: true
+  run_once: true
+  delegate_to: localhost
 
-# - name: Ensure inventory_hostname dir is present - create if absent
-#   ansible.builtin.file:
-#     path: "{{ inventory_hostname_dir_path }}"
-#     state: directory
-#   ignore_errors: true
-#   delegate_to: localhost
+- name: Ensure inventory_hostname dir is present - create if absent
+  ansible.builtin.file:
+    path: "{{ inventory_hostname_dir_path }}"
+    state: directory
+  ignore_errors: true
+  delegate_to: localhost
 
 # # - name: List collected running config files
 # #   ansible.builtin.shell: |
@@ -119,51 +140,51 @@
 # #   run_once: true
 # #   delegate_to: localhost
 
-# - name: Copy the .cfg file to local git repo
-#   ansible.builtin.shell: |
-#     cp {{ tmp_file_path }} {{ inventory_hostname_dir_path }}
-#   ignore_errors: true
-#   delegate_to: localhost
+- name: Copy the .cfg file to local git repo
+  ansible.builtin.shell: |
+    cp {{ tmp_file_path }} {{ inventory_hostname_dir_path }}
+  ignore_errors: true
+  delegate_to: localhost
 
-# - name: Commit the changes and push to the remote repository
-#   ansible.builtin.shell: |
-#      cd {{ tmp_root_dir }}/{{ git_repo_name }}
-#      git config --global user.name {{ git_user }}
-#      git config --global user.email {{ git_user_email }}
-#      git add .
-#      git commit -m "file updates on $(date)"
-#      git push
-#   run_once: true
-#   environment:
-#     GIT_SSL_NO_VERIFY: "true"
-#   # ignore_errors: true # You want the play to fail if git push does not happen
-#   delegate_to: localhost
+- name: Commit the changes and push to the remote repository
+  ansible.builtin.shell: |
+     cd {{ tmp_root_dir }}/{{ git_repo_name }}
+     git config --global user.name {{ git_user }}
+     git config --global user.email {{ git_user_email }}
+     git add .
+     git commit -m "file updates on $(date)"
+     git push
+  run_once: true
+  environment:
+    GIT_SSL_NO_VERIFY: "true"
+  # ignore_errors: true # You want the play to fail if git push does not happen
+  delegate_to: localhost
 
-# # Might not need this since containers are ephemeral.
-# # But if testing or end up running the playbook more than once in the same container, this comes in handy
-# - name: Clean up files
-#   ansible.builtin.shell: |
-#     cd {{ tmp_root_dir }}
-#     rm -rf {{ git_repo_name }}
-#   run_once: true
-#   ignore_errors: true
-#   delegate_to: localhost
+# Might not need this since containers are ephemeral.
+# But if testing or end up running the playbook more than once in the same container, this comes in handy
+- name: Clean up files
+  ansible.builtin.shell: |
+    cd {{ tmp_root_dir }}
+    rm -rf {{ git_repo_name }}
+  run_once: true
+  ignore_errors: true
+  delegate_to: localhost
 
 
 ##### STEP 5. DELETE REST API USER FROM DEVICE
 
-- name: Change connection type
-  ansible.builtin.set_fact:
-    ansible_connection: ssh
+# - name: Change connection type
+#   ansible.builtin.set_fact:
+#     ansible_connection: ssh
 
-- name: Remove rest-api-admin user
-  ansible.builtin.raw: |
-    config global
-    config system api-user
-    delete {{ api_admin_user }}
-    end
-  register: remove_user
-  no_log: false
+# - name: Remove rest-api-admin user
+#   ansible.builtin.raw: |
+#     config global
+#     config system api-user
+#     delete {{ api_admin_user }}
+#     end
+#   register: remove_user
+#   no_log: false
 
 
 
