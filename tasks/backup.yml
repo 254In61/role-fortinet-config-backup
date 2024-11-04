@@ -44,7 +44,7 @@
 
 - name: Extract API token from command output
   ansible.builtin.set_fact:
-    api_token: "{{ generate_token.stdout | regex_search('New API key: (\\w+)', '\\1') }}"
+    api_token: "{{ generate_token.stdout | regex_search('New API key: (\\w+)', '\\1') }}[0]"
   
 - name: Display the extracted API token
   ansible.builtin.debug:
