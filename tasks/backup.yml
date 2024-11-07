@@ -15,6 +15,7 @@
     api_admin_user: rest-api-admin
     mgmt_vdom: root
   delegate_to: localhost
+  ignore_errors: true # You want the role to run end to end
 
 - name: Create a rest-api-admin user
   ansible.builtin.raw: |
@@ -26,6 +27,7 @@
     next
     end
   register: create_user
+  ignore_errors: true # You want the role to run end to end
   no_log: false
 
 # - name: Debug create_user output
@@ -38,6 +40,7 @@
     config global
     execute api-user generate-key {{ api_admin_user }}
   register: generate_token
+  ignore_errors: true # You want the role to run end to end
   no_log: false
 
 - name: Enable https accessibility
@@ -46,6 +49,7 @@
     edit "port1"
     set allowaccess https
   register: https_config
+  ignore_errors: true # You want the role to run end to end
     
 
 # - name: Debug generate_token output
@@ -56,6 +60,7 @@
   ansible.builtin.set_fact:
     api_token: "{{ generate_token.stdout | regex_search('New API key: (\\w+)', '\\1') }}" #generates a list
   delegate_to: localhost
+  ignore_errors: true # You want the role to run end to end
 
 # - name: Display the extracted API token
 #   ansible.builtin.debug:
@@ -79,7 +84,7 @@
     return_content: true
   register: fortios_config
   delegate_to: localhost
-  ignore_errors: true # You don't want all of them failing if first 2-3 fails
+  ignore_errors: true # You want the role to run end to end
 
 # - name: Debug fortios_config output
 #   ansible.builtin.debug:
@@ -114,6 +119,7 @@
   ignore_errors: true
   delegate_to: localhost
   delegate_to: localhost
+  ignore_errors: true # You want the role to run end to end
 
 - name: Clone the config backup git repository
   ansible.builtin.git:
@@ -161,7 +167,7 @@
   run_once: true
   environment:
     GIT_SSL_NO_VERIFY: "true"
-  # ignore_errors: true # You want the play to fail if git push does not happen
+  ignore_errors: true # You want the role to run end to end
   delegate_to: localhost
 
 # Might not need this since containers are ephemeral.
