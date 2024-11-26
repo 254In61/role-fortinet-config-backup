@@ -96,7 +96,7 @@
   ignore_errors: true
   when: fortios_config["failed"] == false
 
-- name: Use ssh to emove rest-api-admin user
+- name: Use ssh to remove rest-api-admin user
   ansible.builtin.raw: |
     config global
     config system api-user
