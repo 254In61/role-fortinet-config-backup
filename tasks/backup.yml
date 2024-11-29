@@ -96,15 +96,15 @@
   ignore_errors: true
   when: fortios_config["failed"] == false
 
-# - name: Use ssh to remove rest-api-admin user
-#   ansible.builtin.raw: |
-#     config global
-#     config system api-user
-#     delete {{ api_admin_user }}
-#     end
-#   register: remove_user
-#   no_log: false
-#   ignore_errors: true # You don't want all of them failing if first 2-3 fails
+- name: Use ssh to remove rest-api-admin user
+  ansible.builtin.raw: |
+    config global
+    config system api-user
+    delete {{ api_admin_user }}
+    end
+  register: remove_user
+  no_log: false
+  ignore_errors: true # You don't want all of them failing if first 2-3 fails
 
 - name: Import Tasks
   ansible.builtin.import_tasks: git.yml
