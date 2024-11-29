@@ -42,13 +42,13 @@
   ignore_errors: true # You want the role to run end to end
   no_log: false
 
-- name: Use SSH to Enable https accessibility
-  ansible.builtin.raw: |
-    config system interface
-    edit "port1"
-    set allowaccess https
-  register: https_config
-  ignore_errors: true # You want the role to run end to end
+# - name: Use SSH to Enable https accessibility
+#   ansible.builtin.raw: |
+#     config system interface
+#     edit "port1"
+#     set allowaccess https
+#   register: https_config
+#   ignore_errors: true # You want the role to run end to end
     
 
 # - name: Debug generate_token output
