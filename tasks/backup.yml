@@ -3,14 +3,14 @@
 # STEP 2. Use SSH to generate rest-api-admin user token
 # STEP 3. Use SSH to Enable https accessibility
 # STEP 4. Extract API token from command output
-# STEP 5. Extract running configs for {{ ansible_host }} using REST API Call
+# STEP 5. Extract running configs for {{ inventory_hostname }} using REST API Call
 # STEP 6. Use ssh to emove rest-api-admin user
 # STEP 7. Git operations
 
 - name: Set varibales
   ansible.builtin.set_fact:
-    tmp_file_path: "{{ tmp_root_dir }}/{{ ansible_host }}-running-config.cfg"
-    ansible_host_dir_path: "{{ tmp_root_dir }}/{{ git_repo_name }}/{{ vendor_dir }}/{{ ansible_host }}/config-backup"
+    tmp_file_path: "{{ tmp_root_dir }}/{{ inventory_hostname }}-running-config.cfg"
+    inventory_hostname_dir_path: "{{ tmp_root_dir }}/{{ git_repo_name }}/{{ vendor_dir }}/{{ inventory_hostname }}/config-backup"
     ansible_connection: ssh # Change connection type to ssh
     api_admin_user: rest-api-admin
     mgmt_vdom: root
