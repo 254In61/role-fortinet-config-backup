@@ -42,6 +42,7 @@
   ignore_errors: true # You want the role to run end to end
   no_log: false
 
+# HTTPS already enabled on the devices
 # - name: Use SSH to Enable https accessibility
 #   ansible.builtin.raw: |
 #     config system interface
@@ -61,12 +62,14 @@
   delegate_to: localhost
   ignore_errors: true # You want the role to run end to end
 
-- name: Display the extracted API token
-  ansible.builtin.debug:
-    msg: 
-      - "API Token      = {{ api_token[0] }}"
-      - "API Admin User = {{ api_admin_user }}"
+# - name: Display the extracted API token
+#   ansible.builtin.debug:
+#     msg: 
+#       - "API Token      = {{ api_token[0] }}"
+#       - "API Admin User = {{ api_admin_user }}"
 
+# Using ansible_host on the URL.
+# Ansible Controller seem not to resolve some DNS names on the URL
 - name: Extract running configs for {{ inventory_hostname }} using REST API Call
   ansible.builtin.uri:
     url: "https://{{ ansible_host }}/api/v2/monitor/system/config/backup"
@@ -96,15 +99,15 @@
   ignore_errors: true
   when: fortios_config["failed"] == false
 
-# - name: Use ssh to remove rest-api-admin user
-#   ansible.builtin.raw: |
-#     config global
-#     config system api-user
-#     delete {{ api_admin_user }}
-#     end
-#   register: remove_user
-#   no_log: false
-#   ignore_errors: true # You don't want all of them failing if first 2-3 fails
+- name: Use ssh to remove rest-api-admin user
+  ansible.builtin.raw: |
+    config global
+    config system api-user
+    delete {{ api_admin_user }}
+    end
+  register: remove_user
+  no_log: false
+  ignore_errors: true # You don't want all of them failing if first 2-3 fails
 
-# - name: Import Tasks
-#   ansible.builtin.import_tasks: git.yml
+- name: Import Tasks
+  ansible.builtin.import_tasks: git.yml
