@@ -9,10 +9,8 @@
 
 - name: Set varibales
   ansible.builtin.set_fact:
-    tmp_file_path: "{{ tmp_root_dir }}/{{ inventory_hostname }}-running-config.cfg"
-    inventory_hostname_dir_path: "{{ tmp_root_dir }}/{{ git_repo_name }}/{{ vendor_dir }}/{{ inventory_hostname }}/config-backup"
-    ansible_connection: ssh # Change connection type to ssh
-    api_admin_user: rest-api-admin
+    ansible_connection: ssh           # Change connection type to ssh
+    api_admin_user: rest-api-admin    # the account is created on the fly and then deleted
     mgmt_vdom: root
   delegate_to: localhost
   ignore_errors: true # You want the role to run end to end
@@ -94,7 +92,7 @@
 - name: Save the configuration to the temporary config store
   ansible.builtin.copy:
     content: "{{ fortios_config.content }}"
-    dest: "{{ tmp_file_path }}"
+    dest: "{{ _local_file_path_ }}"
   delegate_to: localhost
   ignore_errors: true
   when: fortios_config["failed"] == false
@@ -108,6 +106,3 @@
   register: remove_user
   no_log: false
   ignore_errors: true # You don't want all of them failing if first 2-3 fails
-
-- name: Import Tasks
-  ansible.builtin.import_tasks: git.yml
