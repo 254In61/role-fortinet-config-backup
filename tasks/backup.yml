@@ -68,7 +68,7 @@
 
 # Using ansible_host on the URL.
 # Ansible Controller seem not to resolve some DNS names on the URL
-- name: "Extract running configs for {{ inventory_hostname }} using REST API Call"
+- name: Extract running configs using REST API Call
   ansible.builtin.uri:
     url: "https://{{ ansible_host }}/api/v2/monitor/system/config/backup"
     method: POST
