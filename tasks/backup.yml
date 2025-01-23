@@ -87,7 +87,7 @@
     validate_certs: false
     return_content: true
   register: fortios_config
-  delegate_to: localhost
+  # delegate_to: localhost
   ignore_errors: true # You want the role to run end to end
 
 # - name: Debug fortios_config output
