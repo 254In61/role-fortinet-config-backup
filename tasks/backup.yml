@@ -68,6 +68,12 @@
 
 # Using ansible_host on the URL.
 # Ansible Controller seem not to resolve some DNS names on the URL
+
+- name: Debug urls to confirm
+  ansible.builtin.debug:
+    msg: "{{ inventory_hostname }} URL : https://{{ ansible_host }}/api/v2/monitor/system/config/backup"
+  delegate_to: localhost
+
 - name: Extract running configs using REST API Call
   ansible.builtin.uri:
     url: "https://{{ ansible_host }}/api/v2/monitor/system/config/backup"
