@@ -60,11 +60,11 @@
   delegate_to: localhost
   ignore_errors: true # You want the role to run end to end
 
-# - name: Display the extracted API token
-#   ansible.builtin.debug:
-#     msg: 
-#       - "API Token      = {{ api_token[0] }}"
-#       - "API Admin User = {{ api_admin_user }}"
+- name: Display the extracted API token
+  ansible.builtin.debug:
+    msg: 
+      - "API Token      = {{ api_token[0] }}"
+      - "API Admin User = {{ api_admin_user }}"
 
 # Using ansible_host on the URL.
 # Ansible Controller seem not to resolve some DNS names on the URL
@@ -95,7 +95,7 @@
 #     var: fortios_config
 #   delegate_to: localhost
 
-- name: Save the configuration to the temporary config store
+- name: Save the configuration to a file
   ansible.builtin.copy:
     content: "{{ fortios_config.content }}"
     dest: "{{ _local_file_path_ }}"
